@@ -2,8 +2,7 @@ services:
   backend:
     build:
       context: .
-      target: development
-    container_name: time_tracking_backend_server
+    container_name: timesheet-backend-server
     command: npm run dev
     ports:
       - "3000:3000"
@@ -18,20 +17,18 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: time_tracking_postgres_db
+    container_name: timesheet-postgres-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
-      POSTGRES_DB: devdb
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: timesheetdb
     volumes:
-      - postgres_data_volume:/var/lib/postgresql/data
+      - timesheet_postgres_data_volume:/var/lib/postgresql/data
 
   adminer:
     image: adminer
-    container_name: time_tracking_adminer_ui
+    container_name: timesheet-adminer-ui
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -39,4 +36,4 @@ services:
       - db
 
 volumes:
-  postgres_data_volume:
+  timesheet_postgres_data_volume:

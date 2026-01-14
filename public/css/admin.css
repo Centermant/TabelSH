@@ -1,0 +1,162 @@
+/* admin.css - Стили для панели администратора */
+
+/* Верхнее меню (шапка) */
+.main-header {
+    background-color: #343a40;
+    color: white;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Основная навигация */
+.main-nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.main-nav li {
+    position: relative;
+}
+
+.main-nav a,
+.main-nav button {
+    text-decoration: none;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    display: block;
+    background-color: #495057;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.main-nav a:hover,
+.main-nav button:hover {
+    background-color: #6c757d;
+}
+
+/* Основное содержимое страницы */
+.main-content {
+    padding: 1rem 0;
+    background-color: #f0f2f5;
+}
+
+.main-content .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Стили для таблицы пользователей */
+#usersTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+#usersTable th,
+#usersTable td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+#usersTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+#usersTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#usersTable .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Стили для формы добавления/изменения пользователя */
+.form-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: normal;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-group .checkbox-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .main-header .container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .main-nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .main-nav li {
+        width: 100%;
+        text-align: center;
+    }
+
+    #usersTable {
+        font-size: 0.85rem;
+    }
+
+    #usersTable th,
+    #usersTable td {
+        padding: 0.5rem;
+    }
+}

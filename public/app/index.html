@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Табельный учет</title>
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/timesheet.css">
 </head>
 <body>
+
+<!-- Верхнее меню (навигация) -->
+<header class="main-header">
     <div class="container">
-        <h1>Табельный учет</h1>
-        <nav>
+        <h1 class="app-title">Табельный учет</h1>
+        <!-- Кнопка Меню для мобильной версии -->
+        <button class="menu-toggle" aria-label="Открыть меню">&#9776;</button>
+        <nav class="main-nav">
             <ul>
                 <li><a href="#" id="logoutLink">Выход</a></li>
                 <li><a href="#" id="timesheetLink">Табель</a></li>
@@ -30,18 +36,46 @@
                 <li class="dropdown">
                     <button>Пользовательские отчёты</button>
                     <div class="dropdown-content">
-                        <a href="#">Отчёт Табель Галар</a>
-                        <a href="#">Отчёт табель по клиентам</a>
+                        <a href="#" id="galarReportLink">Отчёт Табель Галар</a>
+                        <a href="#" id="clientsReportLink">Отчёт табель по клиентам</a>
                     </div>
                 </li>
             </ul>
         </nav>
+    </div>
+</header>
 
+<!-- Боковое меню (скрыто по умолчанию) -->
+<nav class="mobile-menu">
+    <div class="mobile-menu-header">
+        <h2>Меню</h2>
+        <button class="close-menu" aria-label="Закрыть меню">&times;</button>
+    </div>
+    <ul>
+        <li><a href="#" id="mobile-logoutLink">Выход</a></li>
+        <li><a href="#" id="mobile-timesheetLink">Табель</a></li>
+        <li><a href="#" id="mobile-organizationsLink">Организации</a></li>
+        <li><a href="#" id="mobile-employeesLink">Сотрудники организаций</a></li>
+        <li><a href="#" id="mobile-activitiesLink">Рабочая активность</a></li>
+        <li><a href="#" id="mobile-consultationsLink">Телефонные консультации</a></li>
+        <li><a href="#" id="mobile-galarReportLink">Отчёт Табель Галар</a></li>
+        <li><a href="#" id="mobile-clientsReportLink">Отчёт табель по клиентам</a></li>
+    </ul>
+</nav>
+
+<!-- Основное содержимое страницы -->
+<main class="main-content">
+    <div class="container">
         <div id="contentArea">
             <!-- Сюда будут подгружаться соответствующие панели -->
+            <div class="welcome-panel">
+                <h2>Добро пожаловать в систему Табельного учета!</h2>
+                <p>Выберите раздел из верхнего меню, чтобы начать работу.</p>
+            </div>
         </div>
     </div>
+</main>
 
-    <script src="/js/timesheet.js"></script>
+<script type="module" src="/js/timesheet.js"></script>
 </body>
 </html>

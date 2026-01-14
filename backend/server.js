@@ -9,6 +9,12 @@ import { fileURLToPath } from 'url';
 import authRoutes from './src/routes/auth.js';
 import adminRoutes from './src/routes/admin.js';
 import timesheetRoutes from './src/routes/timesheet.js';
+import organizationRoutes from './src/routes/organizations.js';
+import employeeRoutes from './src/routes/employees.js';
+import workActivityRoutes from './src/routes/workActivities.js';
+import phoneConsultationRoutes from './src/routes/phoneConsultations.js';
+import timesheetEntriesRoutes from './src/routes/timesheet_entries.js';
+import clientTimesheetReportRoutes from './src/routes/clientTimesheetReport.js';
 
 // Получаем __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +40,12 @@ fastify.register(FastifyStatic, {
 fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(adminRoutes, { prefix: '/api/admin' });
 fastify.register(timesheetRoutes, { prefix: '/api/timesheet' });
+fastify.register(organizationRoutes, { prefix: '/api/timesheet' });
+fastify.register(employeeRoutes, { prefix: '/api/timesheet' });
+fastify.register(workActivityRoutes, { prefix: '/api/timesheet' });
+fastify.register(phoneConsultationRoutes, { prefix: '/api/timesheet' });
+fastify.register(timesheetEntriesRoutes, { prefix: '/api/timesheet' });
+fastify.register(clientTimesheetReportRoutes, { prefix: '/api/timesheet' });
 
 // Запускаем сервер
 const start = async () => {

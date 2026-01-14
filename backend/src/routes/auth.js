@@ -3,9 +3,11 @@ import { authenticateUser } from '../services/authService.js';
 export default async function authRoutes(fastify, options) {
   fastify.post('/login', async (request, reply) => {
     const { login, password, application } = request.body;
-
+    
     try {
-      const result = await authenticateUser(login, password, application);
+      // Передаем клиент БД в сервис аутентификации
+      const result = await authenticateUser(fastify.pg, login, password, application);
+      
       if (result.success) {
         return reply.send(result);
       } else {
@@ -13,12 +15,11 @@ export default async function authRoutes(fastify, options) {
       }
     } catch (error) {
       request.log.error(error);
-      return reply.code(500).send({ error: 'Internal Server Error' });
+      return reply.code(500).send({ error: 'Внутренняя ошибка сервера' });
     }
   });
-
+  
   fastify.post('/logout', async (request, reply) => {
-    // Здесь можно добавить логику инвалидации токена, если используется
-    return reply.send({ message: 'Logged out successfully' });
+    return reply.send({ message: 'Выход выполнен успешно' });
   });
 }
