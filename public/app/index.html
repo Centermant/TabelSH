@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Табельный учет</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Табельный учет</h1>
+        <nav>
+            <ul>
+                <li><a href="#" id="logoutLink">Выход</a></li>
+                <li><a href="#" id="timesheetLink">Табель</a></li>
+                <li class="dropdown">
+                    <button>Клиенты</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="organizationsLink">Организации</a>
+                        <a href="#" id="employeesLink">Сотрудники организаций</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <button>Рабочий журнал</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="activitiesLink">Рабочая активность</a>
+                        <a href="#" id="consultationsLink">Телефонные консультации</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <button>Пользовательские отчёты</button>
+                    <div class="dropdown-content">
+                        <a href="#">Отчёт Табель Галар</a>
+                        <a href="#">Отчёт табель по клиентам</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="contentArea">
+            <!-- Сюда будут подгружаться соответствующие панели -->
+        </div>
+    </div>
+
+    <script src="/js/timesheet.js"></script>
+</body>
+</html>

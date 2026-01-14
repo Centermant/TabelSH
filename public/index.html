@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Вход в систему</h1>
+        <form id="loginForm">
+            <label for="login">Логин:</label>
+            <input type="text" id="login" name="login" required>
+
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="application">Приложение:</label>
+            <select id="application" name="application" required>
+                <option value="admin">Администратор</option>
+                <option value="timesheet" selected>Табельный учёт</option>
+            </select>
+
+            <button type="submit">Войти</button>
+        </form>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>
