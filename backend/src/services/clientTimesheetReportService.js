@@ -1,11 +1,12 @@
 /**
  * Получает данные для отчета табеля по клиентам за конкретный период и организацию.
  * Исключает рабочие активности, отмеченные как "подписанный табель".
+ * Фильтрует активности и консультации по текущему пользователю.
  * @param {Object} db - Клиент Fastify Postgres.
  * @param {number} month - Месяц (1-12).
  * @param {number} year - Год.
  * @param {number} organizationId - ID организации для фильтрации.
- * @param {number} userId - ID аутентифицированного пользователя (может использоваться для проверки прав).
+ * @param {number} userId - ID аутентифицированного пользователя.
  * @returns {Promise<Object>} Объект, содержащий данные отчета и связанную информацию (например, название организации).
  */
 export async function getClientTimesheetReportData(db, month, year, organizationId, userId) {
@@ -18,25 +19,24 @@ export async function getClientTimesheetReportData(db, month, year, organization
     }
     const organizationName = orgResult.rows[0].short_name;
     
-    // Получить неподписанные рабочие активности для организации за период
+    // Получить неподписанные рабочие активности для организации за период, принадлежащие пользователю
     const activitiesQuery = `
       SELECT date, work_time, activity_type, description
       FROM work_activities
       WHERE organization_id = $1 AND EXTRACT(MONTH FROM date) = $2 AND EXTRACT(YEAR FROM date) = $3
-      AND has_signed_timesheet = FALSE
+      AND has_signed_timesheet = FALSE AND user_id = $4
       ORDER BY date
     `;
-    const activitiesValues = [organizationId, month, year];
+    const activitiesValues = [organizationId, month, year, userId];
     const activitiesResult = await db.query(activitiesQuery, activitiesValues);
     const activities = activitiesResult.rows.map(act => {
-      // Преобразуем строку даты в объект Date
       return {
         ...act,
         date: new Date(act.date)
       };
     });
     
-    // Получить телефонные консультации для сотрудников организации за период
+    // Получить телефонные консультации для сотрудников организации за период, принадлежащие пользователю
     // Сначала получим список ФИО сотрудников из организации
     const employeesQuery = 'SELECT fio FROM employees WHERE organization_id = $1';
     const employeesResult = await db.query(employeesQuery, [organizationId]);
@@ -51,17 +51,18 @@ export async function getClientTimesheetReportData(db, month, year, organization
       };
     }
     
-    // Используем UNNEST с ARRAY для IN-клаузы
+    // Используем ANY для фильтрации по списку ФИО сотрудников
     const consultationsQuery = `
       SELECT date, spent_time, client_fio, description
       FROM phone_consultations
       WHERE client_fio = ANY($1::text[]) AND EXTRACT(MONTH FROM date) = $2 AND EXTRACT(YEAR FROM date) = $3
+      AND user_id = $4
       ORDER BY date, client_fio
     `;
-    const consultationsValues = [employeeFios, month, year]; // Передаем массив как первый параметр
+    const consultationsValues = [employeeFios, month, year, userId];
+    
     const consultationsResult = await db.query(consultationsQuery, consultationsValues);
     const consultations = consultationsResult.rows.map(cons => {
-      // Преобразуем строку даты в объект Date
       return {
         ...cons,
         date: new Date(cons.date)
