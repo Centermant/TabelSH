@@ -1,5 +1,13 @@
 /* admin.css - Стили для панели администратора */
 
+@viewport {
+  zoom: 1.0;
+  max-zoom: 1.0;
+  min-zoom: 1.0;
+  user-zoom: none;
+  user-select: none;
+}
+
 /* Верхнее меню (шапка) */
 .main-header {
     background-color: #343a40;

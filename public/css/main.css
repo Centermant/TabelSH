@@ -1,5 +1,13 @@
 /* main.css - Общие стили для всего приложения */
 
+@viewport {
+  zoom: 1.0;
+  max-zoom: 1.0;
+  min-zoom: 1.0;
+  user-zoom: none;
+  user-select: none;
+}
+
 * {
     margin: 0;
     padding: 0;

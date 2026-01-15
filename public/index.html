@@ -2,31 +2,37 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Вход в систему</title>
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Вход в систему</h1>
-        <form id="loginForm">
-            <label for="login">Логин:</label>
-            <input type="text" id="login" name="login" required>
-
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required>
-
-            <label for="application">Приложение:</label>
-            <select id="application" name="application" required>
-                <option value="admin">Администратор</option>
-                <option value="timesheet" selected>Табельный учёт</option>
-            </select>
-
-            <button type="submit">Войти</button>
-        </form>
-        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Вход в систему</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginInput">Логин:</label>
+                    <input type="text" id="loginInput" name="login" required>
+                </div>
+                <div class="form-group">
+                    <label for="passwordInput">Пароль:</label>
+                    <input type="password" id="passwordInput" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="applicationSelect">Приложение:</label>
+                    <select id="applicationSelect" name="application" required>
+                        <option value="">-- Выберите приложение --</option>
+                        <option value="admin">Администрирование</option>
+                        <option value="timesheet">Табельный учет</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+            <div id="errorMessage" class="error-message hidden"></div>
+        </div>
     </div>
-
     <script src="/js/login.js"></script>
 </body>
 </html>

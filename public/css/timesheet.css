@@ -1,3 +1,13 @@
+/* timesheet.css - Стили для приложения Табельный учет */
+
+@viewport {
+  zoom: 1.0;
+  max-zoom: 1.0;
+  min-zoom: 1.0;
+  user-zoom: none;
+  user-select: none;
+}
+
 /* Верхнее меню (шапка) */
 .main-header {
     background-color: #343a40;
@@ -200,10 +210,12 @@
         display: block;
     }
 
+    /* Стили для контейнера основного содержимого */
     .main-content {
         padding-top: 60px;
     }
 
+    /* Стили для форм и таблиц */
     .form-section,
     .table-container {
         padding: 0.75rem;
@@ -227,6 +239,7 @@
         font-size: 0.8rem;
     }
 
+    /* Стили для таблицы */
     table {
         font-size: 0.8rem;
     }
@@ -235,6 +248,7 @@
         padding: 0.5rem;
     }
 
+    /* Стили для выпадающих списков */
     .dropdown-content {
         position: static;
         background-color: #f8f9fa;
