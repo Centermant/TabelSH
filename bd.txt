@@ -1,0 +1,136 @@
+DROP TABLE IF EXISTS "employees";
+DROP SEQUENCE IF EXISTS employees_id_seq;
+CREATE SEQUENCE employees_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."employees" (
+    "id" integer DEFAULT nextval('employees_id_seq') NOT NULL,
+    "fio" character varying(255) NOT NULL,
+    "phone_number" character varying(50),
+    "position" text,
+    "notes" text,
+    "organization_id" integer,
+    CONSTRAINT "employees_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+
+DROP TABLE IF EXISTS "organizations";
+DROP SEQUENCE IF EXISTS organizations_id_seq;
+CREATE SEQUENCE organizations_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."organizations" (
+    "id" integer DEFAULT nextval('organizations_id_seq') NOT NULL,
+    "short_name" character varying(255) NOT NULL,
+    "full_name" text,
+    CONSTRAINT "organizations_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+
+DROP TABLE IF EXISTS "phone_consultations";
+DROP SEQUENCE IF EXISTS phone_consultations_id_seq;
+CREATE SEQUENCE phone_consultations_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."phone_consultations" (
+    "id" integer DEFAULT nextval('phone_consultations_id_seq') NOT NULL,
+    "date" date NOT NULL,
+    "spent_time" numeric(5,3) NOT NULL,
+    "client_fio" character varying(255) NOT NULL,
+    "description" text,
+    "user_id" integer NOT NULL,
+    CONSTRAINT "phone_consultations_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+CREATE INDEX idx_phone_consultations_date ON public.phone_consultations USING btree (date);
+
+
+DROP TABLE IF EXISTS "timesheet_entries";
+DROP SEQUENCE IF EXISTS timesheet_entries_id_seq;
+CREATE SEQUENCE timesheet_entries_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."timesheet_entries" (
+    "id" integer DEFAULT nextval('timesheet_entries_id_seq') NOT NULL,
+    "timesheet_id" integer,
+    "entry_date" date NOT NULL,
+    "work_hours" numeric(5,3) NOT NULL,
+    "description" text,
+    CONSTRAINT "timesheet_entries_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX timesheet_entries_timesheet_id_entry_date_key ON public.timesheet_entries USING btree (timesheet_id, entry_date);
+
+CREATE INDEX idx_timesheet_entries_sheet_date ON public.timesheet_entries USING btree (timesheet_id, entry_date);
+
+
+DROP TABLE IF EXISTS "timesheets";
+DROP SEQUENCE IF EXISTS timesheets_id_seq;
+CREATE SEQUENCE timesheets_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."timesheets" (
+    "id" integer DEFAULT nextval('timesheets_id_seq') NOT NULL,
+    "user_id" integer,
+    "month" integer NOT NULL,
+    "year" integer NOT NULL,
+    "period_start" date NOT NULL,
+    "period_end" date NOT NULL,
+    CONSTRAINT "timesheets_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "timesheets_month_check" CHECK (((month >= 1) AND (month <= 12))),
+    CONSTRAINT "timesheets_year_check" CHECK ((year > 2000))
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX timesheets_user_id_month_year_key ON public.timesheets USING btree (user_id, month, year);
+
+CREATE INDEX idx_timesheets_user_period ON public.timesheets USING btree (user_id, month, year);
+
+
+DROP TABLE IF EXISTS "users";
+DROP SEQUENCE IF EXISTS users_id_seq;
+CREATE SEQUENCE users_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."users" (
+    "id" integer DEFAULT nextval('users_id_seq') NOT NULL,
+    "login" character varying(255) NOT NULL,
+    "password" character varying(255) NOT NULL,
+    "role" character varying(50) DEFAULT 'user' NOT NULL,
+    "applications" text[] DEFAULT '{timesheet}'::text[]
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX users_login_key ON public.users USING btree (login);
+
+
+DROP TABLE IF EXISTS "work_activities";
+DROP SEQUENCE IF EXISTS work_activities_id_seq;
+CREATE SEQUENCE work_activities_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."work_activities" (
+    "id" integer DEFAULT nextval('work_activities_id_seq') NOT NULL,
+    "date" date NOT NULL,
+    "work_time" numeric(4,2) NOT NULL,
+    "activity_type" character varying(50),
+    "description" text,
+    "has_signed_timesheet" boolean DEFAULT false,
+    "organization_id" integer,
+    "user_id" integer NOT NULL,
+    CONSTRAINT "work_activities_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "work_activities_activity_type_check" CHECK (((activity_type)::text = ANY (ARRAY[('Консультация'::character varying)::text, ('Настройка'::character varying)::text])))
+)
+WITH (oids = false);
+
+CREATE INDEX idx_work_activities_date ON public.work_activities USING btree (date);
+
+CREATE INDEX idx_work_activities_org ON public.work_activities USING btree (organization_id);
+
+
+ALTER TABLE ONLY "public"."employees" ADD CONSTRAINT "employees_organization_id_fkey" FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."phone_consultations" ADD CONSTRAINT "phone_consultations_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."timesheet_entries" ADD CONSTRAINT "timesheet_entries_timesheet_id_fkey" FOREIGN KEY (timesheet_id) REFERENCES timesheets(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE ONLY "public"."work_activities" ADD CONSTRAINT "work_activities_organization_id_fkey" FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE SET NULL NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."work_activities" ADD CONSTRAINT "work_activities_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE NOT DEFERRABLE;
