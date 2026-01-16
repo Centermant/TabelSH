@@ -100,3 +100,8 @@ INSERT INTO "users" ("id", "login", "password", "role", "applications") VALUES
 Для остановки всех контейнеров выполните команду:
 ```bash
 docker-compose down
+```
+
+## Лицензия
+
+MIT
