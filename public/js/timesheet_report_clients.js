@@ -145,98 +145,91 @@ async function handleSaveReport() {
   }
 }
 
+/**
+ * Генерирует Excel-файл отчета по клиентам
+ * @param {Object} data - Данные для отчета
+ * @param {string} month - Месяц отчета
+ * @param {string} year - Год отчета
+ * @param {string} responsibleFIO - ФИО ответственного
+ * @param {Object} XLSX - Библиотека XLSX
+ */
 function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
   const wb = XLSX.utils.book_new();
   const periodName = getMonthName(parseInt(month)) + ' ' + year;
-  
+
   const allEntriesByDate = {};
-  
+
   data.activities.forEach(activity => {
     const dateObj = new Date(activity.date);
-    const dateStr = dateObj.toISOString().split('T')[0];
-    
+    const dateStr = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+
     if (!allEntriesByDate[dateStr]) {
       allEntriesByDate[dateStr] = { date: dateObj, activities: [], consultations: [] };
     }
-    
+
     allEntriesByDate[dateStr].activities.push({
       work_time: activity.work_time,
       description: `${activity.activity_type} ${activity.description}`
     });
   });
-  
+
   for (const dateStr in data.phoneConsultations) {
     const dateObj = new Date(dateStr);
-    
+
     if (!allEntriesByDate[dateStr]) {
       allEntriesByDate[dateStr] = { date: dateObj, activities: [], consultations: [] };
     }
-    
+
     allEntriesByDate[dateStr].consultations.push(...data.phoneConsultations[dateStr]);
   }
-  
+
   const rowData = [];
-  
   const sortedDates = Object.keys(allEntriesByDate).sort();
-  
+
   for (const dateStr of sortedDates) {
     const entry = allEntriesByDate[dateStr];
     const formattedDate = `${String(entry.date.getDate()).padStart(2, '0')}.${String(entry.date.getMonth() + 1).padStart(2, '0')}.${entry.date.getFullYear()}`;
-    
+
     for (const act of entry.activities) {
       const workHoursValue = parseFloat(act.work_time);
       const description = act.description;
       rowData.push([formattedDate, workHoursValue, description]);
     }
-    
+
     if (entry.consultations.length > 0) {
       let totalConsultationHours = 0;
-      const consultationDetails = {};
-
       entry.consultations.forEach(c => {
-        const spentTimeNum = parseFloat(c.spent_time);
-        if (isNaN(spentTimeNum)) {
-          console.error("Invalid spent_time value:", c.spent_time);
-          return;
-        }
-        const effectiveTime = spentTimeNum + 0.25;
-        totalConsultationHours += effectiveTime;
-
-        const effectiveTimeKey = effectiveTime.toString();
-        if (!consultationDetails[effectiveTimeKey]) {
-          consultationDetails[effectiveTimeKey] = [];
-        }
-        consultationDetails[effectiveTimeKey].push(c.client_fio);
+          const spentTimeNum = parseFloat(c.spent_time);
+          if (isNaN(spentTimeNum)) {
+              console.error("Invalid spent_time value:", c.spent_time);
+              return;
+          }
+          totalConsultationHours += spentTimeNum + 0.125;
+          //Добавление 0,125 ч к каждой консультации - особенность организации
       });
 
-      let consultationDescription = 'Телефонные консультации - ';
-      const parts = [];
-      for (const effectiveTimeKey in consultationDetails) {
-        const effectiveTime = parseFloat(effectiveTimeKey);
-        const names = consultationDetails[effectiveTimeKey].join(', ');
-        parts.push(`${effectiveTime.toFixed(3)} ч. - ${names}`);
-      }
-      consultationDescription += parts.join(', ');
+      const allClientNames = entry.consultations.map(c => c.client_fio).join(', ');
+      const consultationDescription = `Телефонные консультации - ${totalConsultationHours.toFixed(3).replace(/\.?0+$/, '')} ч. - ${allClientNames}`;
 
       rowData.push([formattedDate, totalConsultationHours, consultationDescription]);
-    }
   }
-  
+  }
+
   const totalHours = rowData.reduce((sum, row) => sum + row[1], 0).toFixed(3);
-  
+
   const wsData = [];
-  
+
   wsData.push([], [], []);
-  
+
   wsData.push([
     data.organizationName,
     '',
     '',
     '',
     '',
-    'ООО «ГАЛАР»'
+    'ООО «ГАЛАР»' //Название организации-исполнителя в отчёте
   ]);
-  
+
   wsData.push([
     '',
     '',
@@ -245,7 +238,7 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
     '',
     ''
   ]);
-  
+
   wsData.push([
     'График консультаций по использованию ПП «Парус-Бюджет» за',
     'График консультаций по использованию ПП «Парус-Бюджет» за',
@@ -254,9 +247,9 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
     periodName,
     periodName
   ]);
-  
+
   wsData.push([], []);
-  
+
   wsData.push([
     'Число',
     'Часы',
@@ -265,7 +258,7 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
     'Направление работы',
     'Направление работы'
   ]);
-  
+
   for (const row of rowData) {
     wsData.push([
       row[0],
@@ -276,7 +269,7 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
       row[2]
     ]);
   }
-  
+
   const lastRow = wsData.length;
   wsData.push([
     'Итого:',
@@ -286,9 +279,9 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
     '',
     ''
   ]);
-  
+
   const ws = XLSX.utils.aoa_to_sheet(wsData);
-  
+
   const colWidths = [
     { wch: 12 },
     { wch: 10 },
@@ -298,8 +291,8 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
     { wch: 20 }
   ];
   ws['!cols'] = colWidths;
-  
-  for (let i = 8; i < wsData.length; i++) {
+
+  for (let i = 5; i < wsData.length; i++) {
     for (let colIndex = 2; colIndex <= 5; colIndex++) {
       const cellAddress = XLSX.utils.encode_cell({ r: i, c: colIndex });
       if (ws[cellAddress]) {
@@ -310,37 +303,37 @@ function generateExcelClientReport(data, month, year, responsibleFIO, XLSX) {
       }
     }
   }
-  
+
   if (!ws['!merges']) {
     ws['!merges'] = [];
   }
-  
+
   ws['!merges'].push({
     s: { r: 5, c: 0 },
     e: { r: 5, c: 3 }
   });
-  
+
   ws['!merges'].push({
     s: { r: 5, c: 4 },
     e: { r: 5, c: 5 }
   });
-  
+
   ws['!merges'].push({
     s: { r: 8, c: 2 },
     e: { r: 8, c: 5 }
   });
-  
+
   for (let rowIndex = 9; rowIndex <= lastRow; rowIndex++) {
     ws['!merges'].push({
       s: { r: rowIndex, c: 2 },
       e: { r: rowIndex, c: 5 }
     });
   }
-  
+
   XLSX.utils.book_append_sheet(wb, ws, "Отчет");
-  
+
   const fileName = `Отчет_по_клиентам_${data.organizationName}_${month.padStart(2, '0')}${year}.xlsx`;
-  
+
   XLSX.writeFile(wb, fileName);
 }
 

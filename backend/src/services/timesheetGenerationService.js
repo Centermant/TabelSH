@@ -30,7 +30,7 @@ export async function generateTimesheetEntries(db, month, year, userId) {
       const consultationParts = [];
       for (const orgName in consultationGroups) {
         const orgCons = consultationGroups[orgName];
-        const orgTotalHours = orgCons.reduce((sum, c) => sum + parseFloat(c.spent_time), 0) + (orgCons.length * 0.25);
+        const orgTotalHours = orgCons.reduce((sum, c) => sum + parseFloat(c.spent_time), 0) + (orgCons.length * 0.125);
         totalConsultationHours += orgTotalHours;
 
         const clientNames = orgCons.map(c => c.client_fio).join(', ');

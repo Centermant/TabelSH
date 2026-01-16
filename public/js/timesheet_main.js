@@ -137,44 +137,55 @@ async function handleGenerate() {
  * @param {number} year - Год
  */
 async function viewTimesheet(month, year) {
-  try {
-    const response = await fetch(`${API_BASE}/entries?month=${month}&year=${year}`, {
-      headers: authHeaders
-    });
-    
-    if (response.ok) {
-      const entries = await response.json();
-      const tbody = document.getElementById('timesheetTableBody');
-      tbody.innerHTML = '';
-      
-      if (entries.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td colspan="3">Табель за ${month}.${year} не сформирован или пуст.</td>`;
-        tbody.appendChild(row);
-      } else {
-        entries.forEach(entry => {
-          // Форматирование даты
-          let formattedDate = '';
-          if (entry.entry_date) {
-            const dateObj = new Date(entry.entry_date);
-            formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${dateObj.getFullYear()}`;
-          }
-          
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${formattedDate}</td>
-            <td>${entry.work_hours}</td>
-            <td>${entry.description || ''}</td>
-          `;
-          tbody.appendChild(row);
+    try {
+        const response = await fetch(`${API_BASE}/entries?month=${month}&year=${year}`, {
+            headers: authHeaders
         });
-      }
-    } else {
-      const errorData = await response.json();
-      alert(`Ошибка загрузки табеля: ${errorData.error}`);
+
+        if (response.ok) {
+            const entries = await response.json();
+            const tbody = document.getElementById('timesheetTableBody');
+            tbody.innerHTML = '';
+
+            if (entries.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="3">Табель за ${month}.${year} не сформирован или пуст.</td>`;
+                tbody.appendChild(row);
+            } else {
+                const totalHours = entries.reduce((sum, entry) => sum + parseFloat(entry.work_hours), 0).toFixed(3);
+
+                // Заполняем таблицу строками данных
+                entries.forEach(entry => {
+                    let formattedDate = '';
+                    if (entry.entry_date) {
+                        const dateObj = new Date(entry.entry_date);
+                        formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${dateObj.getFullYear()}`;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formattedDate}</td>
+                        <td>${entry.work_hours}</td>
+                        <td>${entry.description || ''}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                const totalRow = document.createElement('tr');
+                totalRow.innerHTML = `
+                    <td><strong>Итого:</strong></td>
+                    <td><strong>${totalHours}</strong></td>
+                    <td></td> <!-- Пустая ячейка для описания -->
+                `;
+                totalRow.classList.add('total-row'); 
+                tbody.appendChild(totalRow);
+            }
+        } else {
+            const errorData = await response.json();
+            alert(`Error loading timesheet: ${errorData.error}`);
+        }
+    } catch (error) {
+        console.error('Load timesheet error:', error);
+        alert('An error occurred while loading the timesheet.');
     }
-  } catch (error) {
-    console.error('Ошибка загрузки табеля:', error);
-    alert('Произошла ошибка при загрузке табеля.');
-  }
 }

@@ -192,6 +192,130 @@
     background-color: #495057;
 }
 
+/* Стили для контейнера с полем ввода и кнопкой */
+.input-with-button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-with-button input {
+  flex: 1;
+  margin: 0;
+}
+
+.selector-btn {
+  width: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Стили для модального окна выбора клиента */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.client-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.client-list li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.client-list li:last-child {
+  border-bottom: none;
+}
+
+.client-select-btn {
+  width: 100%;
+  text-align: left;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+}
+
+.client-select-btn:hover {
+  background-color: #e9ecef;
+  color: #007bff;
+}
+
+/* Стили для контейнера поиска в модальном окне */
+.search-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.search-container input {
+  flex: 1;
+  margin: 0;
+}
+
+.search-btn, .clear-btn {
+  padding: 8px 12px;
+  margin: 0;
+}
+
+/* Стили для скрытых элементов */
+.hidden {
+  display: none;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .input-with-button {
+    flex-direction: row;
+  }
+  
+  .selector-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .search-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .search-btn, .clear-btn {
+    width: 100%;
+  }
+}
 /* Адаптивность */
 @media (max-width: 768px) {
     .main-header .container {

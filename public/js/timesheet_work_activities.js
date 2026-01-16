@@ -1,7 +1,6 @@
 const API_BASE = '/api/timesheet';
 const AUTH_TOKEN = localStorage.getItem('authToken');
 
-// Проверка авторизации пользователя
 if (!AUTH_TOKEN) {
   window.location.href = '/';
   exit();
@@ -21,50 +20,6 @@ export async function loadWorkActivitiesPanel() {
   const contentArea = document.getElementById('contentArea');
   contentArea.innerHTML = `
   <h2>Рабочая активность</h2>
-  <div class="filter-section">
-    <h3>Фильтр по периоду</h3>
-    <div class="form-group">
-      <label for="activityMonth">Месяц:</label>
-      <select id="activityMonth" name="month">
-        <option value="1">Январь</option>
-        <option value="2">Февраль</option>
-        <option value="3">Март</option>
-        <option value="4">Апрель</option>
-        <option value="5">Май</option>
-        <option value="6">Июнь</option>
-        <option value="7">Июль</option>
-        <option value="8">Август</option>
-        <option value="9">Сентябрь</option>
-        <option value="10">Октябрь</option>
-        <option value="11">Ноябрь</option>
-        <option value="12">Декабрь</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="activityYear">Год:</label>
-      <input type="number" id="activityYear" name="year" min="2000" max="2100" step="1" value="">
-    </div>
-    <button id="filterActivitiesBtn" class="btn btn-secondary">Показать</button>
-  </div>
-  <div class="table-container">
-    <table id="workActivitiesTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Дата</th>
-          <th>Рабочее время (ч)</th>
-          <th>Тип работ</th>
-          <th>Описание работ</th>
-          <th>Имеется подписанный табель?</th>
-          <th>Организация</th>
-          <th>Действия</th>
-        </tr>
-      </thead>
-      <tbody id="workActivitiesTableBody">
-        <!-- Данные будут загружены сюда -->
-      </tbody>
-    </table>
-  </div>
   <div class="form-section">
     <h3 id="activityFormTitle">Добавить рабочую активность</h3>
     <form id="activityForm">
@@ -89,9 +44,7 @@ export async function loadWorkActivitiesPanel() {
         <textarea id="activityDescription" name="description" rows="3"></textarea>
       </div>
       <div class="form-group">
-        <label>
-          <input type="checkbox" id="activityHasSignedTimesheet" name="hasSignedTimesheet"> Имеется подписанный табель?
-        </label>
+        <label><input type="checkbox" id="activityHasSignedTimesheet" name="hasSignedTimesheet"> Имеется подписанный табель?</label>
       </div>
       <div class="form-group">
         <label for="activityOrganization">Организация:</label>
@@ -104,12 +57,55 @@ export async function loadWorkActivitiesPanel() {
       <button type="button" id="cancelEditActBtn" class="btn btn-danger hidden">Отмена</button>
     </form>
   </div>
+  <div class="form-section">
+    <div class="filter-section">
+      <h3>Фильтр по периоду</h3>
+      <div class="form-group">
+        <label for="activityMonth">Месяц:</label>
+        <select id="activityMonth" name="month">
+          <option value="1">Январь</option>
+          <option value="2">Февраль</option>
+          <option value="3">Март</option>
+          <option value="4">Апрель</option>
+          <option value="5">Май</option>
+          <option value="6">Июнь</option>
+          <option value="7">Июль</option>
+          <option value="8">Август</option>
+          <option value="9">Сентябрь</option>
+          <option value="10">Октябрь</option>
+          <option value="11">Ноябрь</option>
+          <option value="12">Декабрь</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="activityYear">Год:</label>
+        <input type="number" id="activityYear" name="year" min="2000" max="2100" step="1" value="">
+      </div>
+      <button id="filterActivitiesBtn" class="btn btn-secondary">Показать</button>
+    </div>
+    <div class="table-container">
+      <table id="workActivitiesTable">
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Рабочее время (ч)</th>
+            <th>Тип работ</th>
+            <th>Описание работ</th>
+            <th>Имеется подписанный табель?</th>
+            <th>Организация</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody id="workActivitiesTableBody">
+          <!-- Данные будут загружены сюда -->
+        </tbody>
+      </table>
+    </div>
+  </div>
   `;
-  
-  // Привязка обработчиков событий после загрузки DOM
+
   attachEventListeners();
-  await loadOrganizationsForSelect(); // Загрузить список организаций для селекта
-  await loadWorkActivities(); // Загрузить все активности по умолчанию
+  await loadOrganizationsForSelect();
 }
 
 /**
@@ -129,16 +125,16 @@ async function loadOrganizationsForSelect() {
     const response = await fetch(`${API_BASE}/organizations`, {
       headers: authHeaders
     });
-    
+
     if (response.ok) {
       const orgs = await response.json();
       const selectElement = document.getElementById('activityOrganization');
       selectElement.innerHTML = '<option value="">-- Не выбрана --</option>';
-      
+
       orgs.forEach(org => {
         const option = document.createElement('option');
         option.value = org.id;
-        option.textContent = org.short_name; // Используем сокращенное имя
+        option.textContent = org.short_name;
         selectElement.appendChild(option);
       });
     } else {
@@ -151,17 +147,17 @@ async function loadOrganizationsForSelect() {
 }
 
 /**
- * Обрабатывает фильтрацию активностей по периоду
+ * Обрабатывает фильтрацию по периоду
  */
 async function handleFilter() {
   const month = document.getElementById('activityMonth').value;
   const year = document.getElementById('activityYear').value;
-  
+
   if (!month || !year) {
     alert('Пожалуйста, выберите месяц и год для фильтрации.');
     return;
   }
-  
+
   await loadWorkActivities(parseInt(month), parseInt(year));
 }
 
@@ -171,12 +167,12 @@ async function handleFilter() {
  */
 async function handleFormSubmit(e) {
   e.preventDefault();
+
   const formData = new FormData(e.target);
   const activityData = Object.fromEntries(formData.entries());
-  
-  // Преобразовать checkbox в boolean
+
   activityData.hasSignedTimesheet = !!activityData.hasSignedTimesheet;
-  
+
   let url, method;
   if (editingActId) {
     url = `${API_BASE}/work-activities/${editingActId}`;
@@ -185,14 +181,14 @@ async function handleFormSubmit(e) {
     url = `${API_BASE}/work-activities`;
     method = 'POST';
   }
-  
+
   try {
     const response = await fetch(url, {
       method: method,
       headers: authHeaders,
       body: JSON.stringify(activityData)
     });
-    
+
     if (response.ok) {
       resetForm();
       // После сохранения, перезагрузить с тем же фильтром
@@ -203,7 +199,8 @@ async function handleFormSubmit(e) {
       if (selectedMonth && selectedYear) {
         await loadWorkActivities(parseInt(selectedMonth), parseInt(selectedYear));
       } else {
-        await loadWorkActivities(); // Загрузить все, если фильтр не применялся
+        // Если фильтр не применялся, очистить таблицу
+        document.getElementById('workActivitiesTableBody').innerHTML = '';
       }
     } else {
       const errorData = await response.json();
@@ -237,26 +234,27 @@ async function loadWorkActivities(month, year) {
     if (month && year) {
       url += `?month=${month}&year=${year}`;
     }
-    
     const response = await fetch(url, {
       headers: authHeaders
     });
-    
+
     if (response.ok) {
       const acts = await response.json();
+      // Сортировка по дате
+      acts.sort((a, b) => new Date(a.date) - new Date(b.date));
+
       const tbody = document.getElementById('workActivitiesTableBody');
       tbody.innerHTML = '';
-      
+
       acts.forEach(act => {
         let formattedDate = '';
         if (act.date) {
           const dateObj = new Date(act.date);
           formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}.${String(dateObj.getMonth() + 1).padStart(2, '0')}.${dateObj.getFullYear()}`;
         }
-        
+
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${act.id}</td>
           <td>${formattedDate}</td>
           <td>${act.work_time}</td>
           <td>${act.activity_type}</td>
@@ -270,15 +268,14 @@ async function loadWorkActivities(month, year) {
         `;
         tbody.appendChild(row);
       });
-      
-      // Привязка обработчиков для кнопок редактирования и удаления
+
       document.querySelectorAll('.edit-act-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const id = e.target.getAttribute('data-id');
           editWorkActivity(id);
         });
       });
-      
+
       document.querySelectorAll('.delete-act-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const id = e.target.getAttribute('data-id');
@@ -304,7 +301,7 @@ async function editWorkActivity(id) {
     const response = await fetch(`${API_BASE}/work-activities/${id}`, {
       headers: authHeaders
     });
-    
+
     if (response.ok) {
       const act = await response.json();
       document.getElementById('activityId').value = act.id;
@@ -314,8 +311,9 @@ async function editWorkActivity(id) {
       document.getElementById('activityDescription').value = act.description || '';
       document.getElementById('activityHasSignedTimesheet').checked = act.has_signed_timesheet;
       document.getElementById('activityOrganization').value = act.organization_id || '';
-      
+
       document.getElementById('activityFormTitle').textContent = 'Изменить рабочую активность';
+
       editingActId = act.id;
       document.getElementById('cancelEditActBtn').classList.remove('hidden');
     } else {
@@ -334,15 +332,14 @@ async function editWorkActivity(id) {
  */
 async function deleteWorkActivity(id) {
   if (!confirm('Вы уверены, что хотите удалить эту рабочую активность?')) return;
-  
+
   try {
     const response = await fetch(`${API_BASE}/work-activities/${id}`, {
       method: 'DELETE',
       headers: authHeaders
     });
-    
+
     if (response.ok) {
-      // После удаления, перезагрузить с тем же фильтром
       const monthInput = document.getElementById('activityMonth');
       const yearInput = document.getElementById('activityYear');
       const selectedMonth = monthInput.value;
@@ -350,7 +347,7 @@ async function deleteWorkActivity(id) {
       if (selectedMonth && selectedYear) {
         await loadWorkActivities(parseInt(selectedMonth), parseInt(selectedYear));
       } else {
-        await loadWorkActivities(); // Загрузить все, если фильтр не применялся
+        document.getElementById('workActivitiesTableBody').innerHTML = '';
       }
     } else {
       const errorData = await response.json();

@@ -21,24 +21,6 @@ export async function loadEmployeesPanel() {
   const contentArea = document.getElementById('contentArea');
   contentArea.innerHTML = `
   <h2>Сотрудники организаций</h2>
-  <div class="table-container">
-    <table id="employeesTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>ФИО</th>
-          <th>Номер телефона</th>
-          <th>Должность</th>
-          <th>Примечание</th>
-          <th>Организация</th>
-          <th>Действия</th>
-        </tr>
-      </thead>
-      <tbody id="employeesTableBody">
-        <!-- Данные будут загружены сюда -->
-      </tbody>
-    </table>
-  </div>
   <div class="form-section">
     <h3 id="employeeFormTitle">Добавить сотрудника</h3>
     <form id="employeeForm">
@@ -70,11 +52,27 @@ export async function loadEmployeesPanel() {
       <button type="button" id="cancelEditEmpBtn" class="btn btn-danger hidden">Отмена</button>
     </form>
   </div>
+  <div class="table-container">
+    <table id="employeesTable">
+      <thead>
+        <tr>
+          <th>ФИО</th>
+          <th>Номер телефона</th>
+          <th>Должность</th>
+          <th>Примечание</th>
+          <th>Организация</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody id="employeesTableBody">
+        <!-- Данные будут загружены сюда -->
+      </tbody>
+    </table>
+  </div>
   `;
-  
+
   // Привязка обработчиков событий после загрузки DOM
   attachEventListeners();
-  
   // Загрузка организаций для селекта и списка сотрудников
   await loadOrganizationsForSelect();
   await loadEmployees();
@@ -96,12 +94,12 @@ async function loadOrganizationsForSelect() {
     const response = await fetch(`${API_BASE}/organizations`, {
       headers: authHeaders
     });
-    
+
     if (response.ok) {
       const orgs = await response.json();
       const selectElement = document.getElementById('employeeOrganization');
       selectElement.innerHTML = '<option value="">-- Не выбрана --</option>';
-      
+
       orgs.forEach(org => {
         const option = document.createElement('option');
         option.value = org.id;
@@ -123,9 +121,10 @@ async function loadOrganizationsForSelect() {
  */
 async function handleFormSubmit(e) {
   e.preventDefault();
+
   const formData = new FormData(e.target);
   const empData = Object.fromEntries(formData.entries());
-  
+
   let url, method;
   if (editingEmpId) {
     url = `${API_BASE}/employees/${editingEmpId}`;
@@ -134,17 +133,17 @@ async function handleFormSubmit(e) {
     url = `${API_BASE}/employees`;
     method = 'POST';
   }
-  
+
   try {
     const response = await fetch(url, {
       method: method,
       headers: authHeaders,
       body: JSON.stringify(empData)
     });
-    
+
     if (response.ok) {
       resetForm();
-      await loadEmployees();
+      await loadEmployees(); // Перезагружаем список после сохранения
     } else {
       const errorData = await response.json();
       alert(`Ошибка: ${errorData.error}`);
@@ -174,16 +173,18 @@ async function loadEmployees() {
     const response = await fetch(`${API_BASE}/employees`, {
       headers: authHeaders
     });
-    
+
     if (response.ok) {
       const emps = await response.json();
+      // Сортировка по ФИО
+      emps.sort((a, b) => a.fio.localeCompare(b.fio));
+
       const tbody = document.getElementById('employeesTableBody');
       tbody.innerHTML = '';
-      
+
       emps.forEach(emp => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${emp.id}</td>
           <td>${emp.fio}</td>
           <td>${emp.phone_number || ''}</td>
           <td>${emp.position || ''}</td>
@@ -196,15 +197,14 @@ async function loadEmployees() {
         `;
         tbody.appendChild(row);
       });
-      
-      // Привязка обработчиков для кнопок редактирования и удаления
+
       document.querySelectorAll('.edit-emp-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const id = e.target.getAttribute('data-id');
           editEmployee(id);
         });
       });
-      
+
       document.querySelectorAll('.delete-emp-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const id = e.target.getAttribute('data-id');
@@ -230,7 +230,7 @@ async function editEmployee(id) {
     const response = await fetch(`${API_BASE}/employees/${id}`, {
       headers: authHeaders
     });
-    
+
     if (response.ok) {
       const emp = await response.json();
       document.getElementById('employeeId').value = emp.id;
@@ -239,8 +239,9 @@ async function editEmployee(id) {
       document.getElementById('employeePosition').value = emp.position || '';
       document.getElementById('employeeNotes').value = emp.notes || '';
       document.getElementById('employeeOrganization').value = emp.organization_id || '';
-      
+
       document.getElementById('employeeFormTitle').textContent = 'Изменить сотрудника';
+
       editingEmpId = emp.id;
       document.getElementById('cancelEditEmpBtn').classList.remove('hidden');
     } else {
@@ -259,15 +260,15 @@ async function editEmployee(id) {
  */
 async function deleteEmployee(id) {
   if (!confirm('Вы уверены, что хотите удалить этого сотрудника?')) return;
-  
+
   try {
     const response = await fetch(`${API_BASE}/employees/${id}`, {
       method: 'DELETE',
       headers: authHeaders
     });
-    
+
     if (response.ok) {
-      await loadEmployees();
+      await loadEmployees(); // Перезагружаем список после удаления
     } else {
       const errorData = await response.json();
       alert(`Ошибка удаления сотрудника: ${errorData.error}`);
