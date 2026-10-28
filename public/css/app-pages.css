@@ -1,0 +1,74 @@
+/* app-pages.css — Специфичные стили страниц приложения.
+   #contentArea — карточка контента табеля, #usersSection — панель администратора. */
+
+/* Карточка области контента (приложение «Табельный учёт») */
+#contentArea {
+    background-color: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    min-height: 50vh;
+    animation: panel-in 0.25s ease;
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Заголовок активной панели — с акцентной полоской */
+#contentArea > h2:first-child {
+    font-size: 1.35rem;
+    padding-bottom: 0.7rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+#contentArea > h2:first-child::before {
+    content: '';
+    width: 5px;
+    height: 22px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--primary), var(--primary-darker));
+    flex: none;
+}
+
+/* ---------- Мобильная версия (< 640px) ---------- */
+@media (max-width: 639px) {
+    #contentArea {
+        padding: 1rem;
+        border-radius: var(--radius);
+    }
+
+    #contentArea > h2:first-child {
+        font-size: 1.15rem;
+    }
+}
+
+/* ---------- Средне-широкий экран (640–1099px) ---------- */
+@media (min-width: 640px) and (max-width: 1099px) {
+    #contentArea {
+        padding: 1.25rem;
+    }
+}
+
+/* ---------- Широкий экран (≥ 1100px) ---------- */
+@media (min-width: 1100px) {
+    #contentArea {
+        padding: 2rem;
+    }
+
+    #contentArea > h2:first-child {
+        font-size: 1.5rem;
+    }
+}

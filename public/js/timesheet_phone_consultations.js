@@ -106,7 +106,13 @@ export async function loadPhoneConsultationsPanel() {
   
   // Привязка обработчиков событий после загрузки DOM
   attachEventListeners();
-  await loadPhoneConsultations(); // Загрузить все консультации по умолчанию
+
+  // Фильтр по периоду: по умолчанию текущий месяц и год, загрузка данных
+  const now = new Date();
+  document.getElementById('consultationMonth').value = now.getMonth() + 1;
+  document.getElementById('consultationYear').value = now.getFullYear();
+  document.getElementById('consultationsTableContainer').classList.remove('hidden');
+  await loadPhoneConsultations(now.getMonth() + 1, now.getFullYear());
 }
 
 /**
@@ -332,9 +338,11 @@ async function loadPhoneConsultations(month, year) {
             <td>${con.spent_time}</td>
             <td>${con.client_fio}</td>
             <td>${con.description || ''}</td>
-            <td>
-              <button class="btn btn-primary edit-con-btn" data-id="${con.id}">Изменить</button>
-              <button class="btn btn-danger delete-con-btn" data-id="${con.id}">Удалить</button>
+            <td class="actions-cell">
+              <span class="action-buttons">
+                <button class="btn btn-primary edit-con-btn" data-id="${con.id}">Изменить</button>
+                <button class="btn btn-danger delete-con-btn" data-id="${con.id}">Удалить</button>
+              </span>
             </td>
           `;
           tbody.appendChild(row);

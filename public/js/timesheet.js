@@ -11,8 +11,8 @@ const AUTH_TOKEN = localStorage.getItem('authToken');
 
 // Проверка авторизации пользователя
 if (!AUTH_TOKEN) {
-  window.location.href = '/';
-  exit();
+  window.location.replace('/');
+  throw new Error('Не авторизован'); // останавливаем выполнение модуля (exit() в браузере не существует)
 }
 
 const authHeaders = {
@@ -20,107 +20,121 @@ const authHeaders = {
   'Content-Type': 'application/json'
 };
 
-// Обработчик выхода из системы
-document.getElementById('logoutLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userInfo');
-  window.location.href = '/';
-});
-
 // Обработчики для мобильного меню
-document.querySelector('.menu-toggle').addEventListener('click', () => {
-  document.querySelector('.mobile-menu').classList.add('open');
+const mobileMenu = document.querySelector('.mobile-menu');
+const menuBackdrop = document.getElementById('menuBackdrop');
+
+function openMobileMenu() {
+  if (!mobileMenu) return;
+  mobileMenu.classList.add('open');
+  if (menuBackdrop) menuBackdrop.classList.add('show');
+}
+
+function closeMobileMenu() {
+  if (mobileMenu) mobileMenu.classList.remove('open');
+  if (menuBackdrop) menuBackdrop.classList.remove('show');
+}
+
+document.querySelector('.menu-toggle')?.addEventListener('click', openMobileMenu);
+document.querySelector('.close-menu')?.addEventListener('click', closeMobileMenu);
+
+// Закрытие по клику на затемнение фона и по клавише Esc
+if (menuBackdrop) menuBackdrop.addEventListener('click', closeMobileMenu);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeMobileMenu();
+    closeAllDropdowns();
+  }
 });
 
-document.querySelector('.close-menu').addEventListener('click', () => {
-  document.querySelector('.mobile-menu').classList.remove('open');
+/* ---------- Выпадающие подменю верхней навигации ----------
+   Пункт подменю можно выбрать СРАЗУ при наведении: подменю
+   удерживается CSS-правилом .dropdown:hover + невидимым «мостиком»
+   над списком (см. theme.css). Клик по кнопке меню дополнительно
+   «пиннит» подменю классом .open — удобно на планшетах/тач-экранах,
+   где наведения нет. */
+function closeAllDropdowns(exceptEl) {
+  document.querySelectorAll('.main-nav .dropdown.open').forEach((d) => {
+    if (d !== exceptEl) d.classList.remove('open');
+  });
+}
+
+document.querySelectorAll('.main-nav .dropdown').forEach((dd) => {
+  const btn = dd.querySelector(':scope > button');
+  if (!btn) return;
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const willOpen = !dd.classList.contains('open');
+    closeAllDropdowns(dd);
+    dd.classList.toggle('open', willOpen);
+    btn.setAttribute('aria-expanded', String(willOpen));
+  });
+  // При уходе курсора сбрасываем «пинн», чтобы состояние не залипало
+  dd.addEventListener('mouseleave', () => {
+    dd.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  });
 });
 
-document.getElementById('mobile-logoutLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userInfo');
-  window.location.href = '/';
-});
+// Клик мимо выпадающего меню закрывает его
+document.addEventListener('click', () => closeAllDropdowns());
 
-// Обработчики кликов по пунктам мобильного меню
-document.getElementById('mobile-timesheetLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('timesheet');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
+// Подсветка активного раздела в обоих меню
+function setActiveLink(id) {
+  document.querySelectorAll('.main-nav a.active, .mobile-menu a.active')
+    .forEach((el) => el.classList.remove('active'));
+  const desktop = document.getElementById(id);
+  if (desktop) desktop.classList.add('active');
+  const mobile = document.getElementById('mobile-' + id);
+  if (mobile) mobile.classList.add('active');
+}
 
-document.getElementById('mobile-organizationsLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('organizations');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
+const logoutBtn = document.getElementById('logoutLink');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userInfo');
+    window.location.href = '/';
+  });
+}
 
-document.getElementById('mobile-employeesLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('employees');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
+const mobileLogoutBtn = document.getElementById('mobile-logoutLink');
+if (mobileLogoutBtn) {
+  mobileLogoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userInfo');
+    window.location.href = '/';
+  });
+}
 
-document.getElementById('mobile-activitiesLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('activities');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
+// Обработчики кликов по пунктам меню (десктоп + мобильное)
+const NAV_ITEMS = [
+  ['timesheetLink', 'timesheet'],
+  ['organizationsLink', 'organizations'],
+  ['employeesLink', 'employees'],
+  ['activitiesLink', 'activities'],
+  ['consultationsLink', 'consultations'],
+  ['galarReportLink', 'galar-report'],
+  ['clientsReportLink', 'clients-report'],
+];
 
-document.getElementById('mobile-consultationsLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('consultations');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
-
-document.getElementById('mobile-galarReportLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('galar-report');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
-
-document.getElementById('mobile-clientsReportLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('clients-report');
-  document.querySelector('.mobile-menu').classList.remove('open');
-});
-
-// Обработчики кликов по пунктам основного меню
-document.getElementById('timesheetLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('timesheet');
-});
-
-document.getElementById('organizationsLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('organizations');
-});
-
-document.getElementById('employeesLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('employees');
-});
-
-document.getElementById('activitiesLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('activities');
-});
-
-document.getElementById('consultationsLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('consultations');
-});
-
-document.getElementById('galarReportLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('galar-report');
-});
-
-document.getElementById('clientsReportLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  loadPanel('clients-report');
+NAV_ITEMS.forEach(([id, panel]) => {
+  document.getElementById(id)?.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadPanel(panel);
+    setActiveLink(id);
+    closeAllDropdowns();
+  });
+  document.getElementById('mobile-' + id)?.addEventListener('click', (e) => {
+    e.preventDefault();
+    loadPanel(panel);
+    setActiveLink(id);
+    closeMobileMenu();
+  });
 });
 
 /**

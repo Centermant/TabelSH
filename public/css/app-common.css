@@ -1,0 +1,435 @@
+/* app-common.css — Общая шапка, навигация и область контента для всех
+   страниц приложения (Табельный учёт, Панель администратора).
+   Базовые компоненты — в theme.css. */
+
+/* ---------- Верхнее меню (шапка) — светлая, серо-белая ---------- */
+.main-header {
+    background: var(--surface);
+    color: var(--text);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    min-height: var(--header-h);
+    max-width: none;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+}
+
+/* ---------- Основная навигация (десктоп) ---------- */
+.main-nav {
+    min-width: 0; /* корректное поведение flex-элемента */
+}
+
+.main-nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.main-nav li {
+    position: relative;
+}
+
+.main-nav a,
+.main-nav button {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 0.5rem 0.95rem;
+    display: block;
+    background-color: transparent;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 500;
+    transition: background-color var(--transition), color var(--transition),
+        border-color var(--transition);
+}
+
+.main-nav a:hover,
+.main-nav button:hover {
+    background-color: var(--primary-light);
+    color: var(--text);
+}
+
+/* Активный раздел */
+.main-nav a.active,
+.main-nav .dropdown.open > button {
+    background-color: var(--primary-light);
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* Пункт «Выход» — акцентная кнопка */
+.main-nav a#logoutLink {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: #fff;
+    font-weight: 600;
+}
+
+.main-nav a#logoutLink:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+/* Стрелка у пунктов с выпадающим списком */
+.dropdown > button::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    opacity: 0.7;
+    transition: transform var(--transition);
+}
+
+.dropdown:hover > button::after,
+.dropdown.open > button::after {
+    transform: rotate(-135deg) translateY(-2px);
+}
+
+/* Примечание: правило открытия подменю (.dropdown:hover / .open →
+   .dropdown-content) объявлено в theme.css вместе с «мостиком»,
+   который не даёт подменю исчезать при переводе курсора на его кнопки. */
+
+/* Выпадающее меню (светлая карточка под шапкой) */
+.main-nav .dropdown-content a {
+    color: var(--text);
+    background-color: transparent;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    padding: 0.55rem 0.8rem;
+}
+
+.main-nav .dropdown-content a:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+/* ---------- Основное содержимое страницы ---------- */
+.main-content {
+    padding: 1.5rem 0 3rem;
+    background: var(--bg);
+    min-height: calc(100vh - var(--header-h));
+}
+
+.main-content .container {
+    max-width: none;
+    margin: 0 auto;
+}
+
+/* Карточка панели администратора */
+#usersSection {
+    background-color: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    animation: panel-in 0.25s ease;
+}
+
+@keyframes panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- Кнопка «Меню» (бургер) для мобильной версии ---------- */
+.menu-toggle {
+    background: var(--surface-muted);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    transition: background-color var(--transition);
+}
+
+.menu-toggle:hover {
+    background: var(--primary-light);
+}
+
+/* ---------- Боковое (мобильное) меню ---------- */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(85vw, 340px);
+    height: 100%;
+    background: var(--surface);
+    color: var(--text);
+    z-index: 1001;
+    transform: translateX(-102%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid var(--border);
+}
+
+.mobile-menu.open {
+    transform: translateX(0);
+}
+
+.mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: var(--surface-muted);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+}
+
+.mobile-menu-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+}
+
+.close-menu {
+    background: var(--primary-light);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+.close-menu:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.mobile-menu ul {
+    list-style-type: none;
+    padding: 0.75rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mobile-menu li {
+    padding: 0;
+    border-bottom: none;
+}
+
+.mobile-menu a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 500;
+    min-height: 48px;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+/* Маркер-полоска у пунктов меню */
+.mobile-menu a::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--border-strong);
+    flex: none;
+    transition: background-color var(--transition);
+}
+
+.mobile-menu a:hover,
+.mobile-menu a.active {
+    background: var(--primary-light);
+    color: var(--text);
+}
+
+.mobile-menu a:hover::before,
+.mobile-menu a.active::before {
+    background: var(--primary-dark);
+}
+
+/* Пункт «Выход» — акцент */
+.mobile-menu li:last-child a {
+    color: var(--danger-dark);
+}
+
+.mobile-menu li:last-child a:hover {
+    background: var(--danger-soft);
+    color: var(--danger-dark);
+}
+
+/* Затемнение фона под открытым мобильным меню */
+.menu-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(41, 37, 36, 0.45);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.menu-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* =====================================================================
+   РЕЖИМ 1. МОБИЛЬНАЯ ВЕРСИЯ (< 640px): бургер + боковое меню
+   ===================================================================== */
+@media (max-width: 639px) {
+    .main-header .container {
+        padding: 0 0.75rem;
+    }
+
+    .app-title {
+        font-size: 1.05rem;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    .main-content {
+        padding: 0.75rem 0 2rem;
+    }
+
+    #usersSection {
+        padding: 1rem;
+        border-radius: var(--radius);
+    }
+}
+
+/* =====================================================================
+   РЕЖИМ 2. СРЕДНЕ-ШИРОКИЙ ЭКРАН (640–1099px): компактная горизонтальная навигация
+   ===================================================================== */
+@media (min-width: 640px) and (max-width: 1099px) {
+    .main-nav {
+        display: block;
+    }
+
+    .main-nav ul {
+        gap: 0.15rem;
+    }
+
+    .main-nav a,
+    .main-nav button {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    .menu-toggle {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: none;
+    }
+
+    #usersSection {
+        padding: 1.25rem;
+    }
+}
+
+/* =====================================================================
+   РЕЖИМ 3. ШИРОКИЙ ЭКРАН (≥ 1100px): просторная шапка и контент
+   ===================================================================== */
+@media (min-width: 1100px) {
+    .main-header .container {
+        padding: 0 2rem;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .main-nav {
+        display: block;
+    }
+
+    .main-nav a,
+    .main-nav button {
+        padding: 0.5rem 1.05rem;
+        font-size: 0.9rem;
+    }
+
+    .menu-toggle {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: none;
+    }
+
+    .main-content {
+        padding: 2rem 0 3.5rem;
+    }
+
+    #usersSection {
+        padding: 2rem;
+    }
+}

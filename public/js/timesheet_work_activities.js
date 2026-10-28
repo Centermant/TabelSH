@@ -106,6 +106,12 @@ export async function loadWorkActivitiesPanel() {
 
   attachEventListeners();
   await loadOrganizationsForSelect();
+
+  // Фильтр по периоду: по умолчанию текущий месяц и год, загрузка данных
+  const now = new Date();
+  document.getElementById('activityMonth').value = now.getMonth() + 1;
+  document.getElementById('activityYear').value = now.getFullYear();
+  await loadWorkActivities(now.getMonth() + 1, now.getFullYear());
 }
 
 /**
@@ -261,9 +267,11 @@ async function loadWorkActivities(month, year) {
           <td>${act.description || ''}</td>
           <td>${act.has_signed_timesheet ? 'Да' : 'Нет'}</td>
           <td>${act.organization_name || ''}</td>
-          <td>
-            <button class="btn btn-primary edit-act-btn" data-id="${act.id}">Изменить</button>
-            <button class="btn btn-danger delete-act-btn" data-id="${act.id}">Удалить</button>
+          <td class="actions-cell">
+            <span class="action-buttons">
+              <button class="btn btn-primary edit-act-btn" data-id="${act.id}">Изменить</button>
+              <button class="btn btn-danger delete-act-btn" data-id="${act.id}">Удалить</button>
+            </span>
           </td>
         `;
         tbody.appendChild(row);

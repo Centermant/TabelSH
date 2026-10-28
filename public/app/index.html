@@ -2,10 +2,15 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f5f4">
     <title>Табельный учет</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/timesheet.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/app-common.css">
+    <link rel="stylesheet" href="/css/app-pages.css">
 </head>
 <body>
 
@@ -13,11 +18,8 @@
 <header class="main-header">
     <div class="container">
         <h1 class="app-title">Табельный учет</h1>
-        <!-- Кнопка Меню для мобильной версии -->
-        <button class="menu-toggle" aria-label="Открыть меню">&#9776;</button>
         <nav class="main-nav">
             <ul>
-                <li><a href="#" id="logoutLink">Выход</a></li>
                 <li><a href="#" id="timesheetLink">Табель</a></li>
                 <li class="dropdown">
                     <button>Клиенты</button>
@@ -40,8 +42,11 @@
                         <a href="#" id="clientsReportLink">Отчёт табель по клиентам</a>
                     </div>
                 </li>
+                <li><a href="#" id="logoutLink">Выход</a></li>
             </ul>
         </nav>
+        <!-- Кнопка Меню для мобильной версии -->
+        <button class="menu-toggle" aria-label="Открыть меню">&#9776;</button>
     </div>
 </header>
 
@@ -52,7 +57,6 @@
         <button class="close-menu" aria-label="Закрыть меню">&times;</button>
     </div>
     <ul>
-        <li><a href="#" id="mobile-logoutLink">Выход</a></li>
         <li><a href="#" id="mobile-timesheetLink">Табель</a></li>
         <li><a href="#" id="mobile-organizationsLink">Организации</a></li>
         <li><a href="#" id="mobile-employeesLink">Сотрудники организаций</a></li>
@@ -60,6 +64,7 @@
         <li><a href="#" id="mobile-consultationsLink">Телефонные консультации</a></li>
         <li><a href="#" id="mobile-galarReportLink">Отчёт Табель Галар</a></li>
         <li><a href="#" id="mobile-clientsReportLink">Отчёт табель по клиентам</a></li>
+        <li><a href="#" id="mobile-logoutLink">Выход</a></li>
     </ul>
 </nav>
 
@@ -70,11 +75,13 @@
             <!-- Сюда будут подгружаться соответствующие панели -->
             <div class="welcome-panel">
                 <h2>Добро пожаловать в систему Табельного учета!</h2>
-                <p>Выберите раздел из верхнего меню, чтобы начать работу.</p>
+                <p>Выберите раздел из меню, чтобы начать работу: табель за период, справочники клиентов, рабочий журнал или пользовательские отчёты.</p>
             </div>
         </div>
     </div>
 </main>
+
+<div class="menu-backdrop hidden" id="menuBackdrop"></div>
 
 <script type="module" src="/js/timesheet.js"></script>
 </body>
